@@ -2,7 +2,7 @@ name: alpha-ci
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -10,7 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -22,3 +21,7 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
+  assign-author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: toshimaru/auto-author-assign@v1.4.0
