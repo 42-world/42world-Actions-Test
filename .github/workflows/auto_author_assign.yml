@@ -1,0 +1,14 @@
+name: 'Auto Author Assign'
+
+on:
+  label:
+    types: [create, deleted]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  assign-author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: toshimaru/auto-author-assign@v1.6.0
