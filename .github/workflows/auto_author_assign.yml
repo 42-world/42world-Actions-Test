@@ -2,7 +2,7 @@ name: 'Auto Author Assign'
 
 on:
   label:
-    types: [create, deleted]
+    types: [created, deleted]
 
 permissions:
   pull-requests: write
