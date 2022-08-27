@@ -2,7 +2,7 @@ name: alpha-ci
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -10,15 +10,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
       - name: Run a one-line script
-        run: echo Hello, world!
+        run: echo Hello, world!asdfasdfasdfasdfasdfasdfasdfasdf
 
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
 
+  assign-author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: toshimaru/auto-author-assign@v1.4.0
+
+  comment:
+    name: Comment a pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Comment a pull_request
+        uses: mb2dev/github-action-comment-pull-request@1.0.0
+        with:
+          message: "Hello, It's my first comment with Github action !"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          reactions: "+1 | -1 | laugh | hooray | confused | heart | rocket | eyes"
