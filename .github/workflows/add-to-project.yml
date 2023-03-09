@@ -42,7 +42,7 @@ jobs:
             }
           ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} > projectItem.json
           cat projectItem.json
-          PROJECT_ITEM_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == $PROJECT_NAME) | .id")
+          PROJECT_ITEM_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == "$PROJECT_NAME") | .id")
       - name: Update project item field
         run: |
           echo "Update project item field body"
