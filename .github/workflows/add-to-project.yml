@@ -75,7 +75,7 @@ jobs:
           echo "Update project item field body"
           QUERY='
             mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: String) {
-              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {\"$BODY_TYPE\": $Body}}) {
+              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {'"${BODY_TYPE}"': $Body}}) {
                 clientMutationId
               }
             }
