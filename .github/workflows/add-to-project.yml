@@ -73,10 +73,10 @@ jobs:
       - name: Update project item field
         run: |
           echo "Update project item field body"
-          gh api graphql -f query='
+          QUERY='
             mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: String) {
-              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {\"$BODY_TYPE\": $Body}}) {
+              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {"$BODY_TYPE": $Body}}) {
                 clientMutationId
               }
             }
-          ' -f ProjectId="${{ env.PROJECT_ID }}" -f ProjectItemId="${{ env.PROJECT_ITEM_ID }}" -f FieldId="${{ env.PROJECT_FIELD_ID }}" -f Body="$BODY"
+          gh api graphql -f query=$QUERY -f ProjectId="${{ env.PROJECT_ID }}" -f ProjectItemId="${{ env.PROJECT_ITEM_ID }}" -f FieldId="${{ env.PROJECT_FIELD_ID }}" -f Body="$BODY"
