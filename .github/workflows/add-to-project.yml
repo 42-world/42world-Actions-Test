@@ -79,4 +79,5 @@ jobs:
                 clientMutationId
               }
             }
+          '
           gh api graphql -f query=$QUERY -f ProjectId="${{ env.PROJECT_ID }}" -f ProjectItemId="${{ env.PROJECT_ITEM_ID }}" -f FieldId="${{ env.PROJECT_FIELD_ID }}" -f Body="$BODY"
