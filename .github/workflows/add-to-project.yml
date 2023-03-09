@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Update project item field body"
           gh api graphql -f query='
-            mutation ($ProjectItemId: ID!, $FieldId: ID!, $Body: String!) {
+            mutation ($ProjectItemId: ID!, $FieldId: ID!, $Body: Date!) {
               updateProjectV2ItemFieldValue(input: {projectId: $ProjectItemId, fieldId: $FieldId, value: $Body}) {
                 clientMutationId
               }
