@@ -68,6 +68,7 @@ jobs:
           ' -f ProjectId="${{ env.PROJECT_ID }}" > projectField.json
           cat projectField.json
           PROJECT_FIELD_ID=$(cat projectField.json | jq -r ".data.node.fields.nodes | .[] | select(.name == \"$PROJECT_FIELD\") | .id")
+          echo "PROJECT_FIELD_ID=$PROJECT_FIELD_ID" >> $GITHUB_ENV
       - name: Update project item field
         run: |
           echo "Update project item field body"
@@ -77,4 +78,4 @@ jobs:
                 clientMutationId
               }
             }
-          ' -f ProjectId="$PROJECT_ID" -f ProjectItemId="$PROJECT_ITEM_ID" -f FieldId="$PROJECT_FIELD_ID" -f Body="$BODY"
+          ' -f ProjectId="${{ env.PROJECT_ID }}" -f ProjectItemId="${{ env.PROJECT_ITEM_ID }}" -f FieldId="${{ env.PROJECT_FIELD_ID }}" -f Body="$BODY"
