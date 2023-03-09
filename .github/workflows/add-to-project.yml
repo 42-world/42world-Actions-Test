@@ -15,6 +15,7 @@ jobs:
       PROJECT_NAME: "@Yaminyam's untitled project"
       PROJECT_FIELD: Start Date
       BODY: ${{ github.event.issue.created_at }}
+      #using date or text or number
       BODY_TYPE: date
     steps:
       - uses: actions/add-to-project@v0.4.0
@@ -73,8 +74,15 @@ jobs:
       - name: Update project item field
         run: |
           echo "Update project item field body"
+          if [ "$BODY_TYPE" = "number" ]; then
+            BODY_GH_TYPE="Int"
+          elif [ "$BODY_TYPE" = "date" ]; then
+            BODY_GH_TYPE="Date"
+          else
+            BODY_GH_TYPE="String"
+          fi
           QUERY='
-            mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: String) {
+            mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: '"${BODY_GH_TYPE}"') {
               updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {'"${BODY_TYPE}"': $Body}}) {
                 clientMutationId
               }
