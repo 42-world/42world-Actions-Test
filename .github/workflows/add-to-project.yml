@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "Finding projectItem id of particular project from issue"
           gh api graphql -f query='
-            query ($Organization: String!, $Repository: String!, $IssueNumber: Int!, $ProjectField: String!) {
+            query ($Organization: String!, $Repository: String!, $IssueNumber: Int!) {
               repository(owner: $Organization, name: $Repository) {
                 issue(number: $IssueNumber) {
                   projectItems(first: 100) {
@@ -35,20 +35,37 @@ jobs:
                       project {
                         id
                         title
-                        field(name: $ProjectField) {
-                          id
-                        }
                       }
                     }
                   }
                 }
               }
             }
-          ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} -f ProjectField="$PROJECT_FIELD" > projectItem.json
+          ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} -f > projectItem.json
           cat projectItem.json
           PROJECT_ITEM_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .id")
-          PROJECT_FIELD_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .project.field.id")
           PROJECT_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .project.id")
+      - name: Finding project field id
+        run: |
+          echo "Finding project field id"
+          gh api graphql -f query='
+            query ($ProjectId: ID!) {
+              node(id: $ProjectId) {
+                ... on ProjectV2 {
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2Field {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f ProjectId="$PROJECT_ID" -f > projectField.json
+          cat projectField.json
+          PROJECT_FIELD_ID=$(cat projectField.json | jq -r ".data.node.fields.nodes | .[] | select(.name == \"$PROJECT_FIELD\") | .id")
       - name: Update project item field
         run: |
           echo "Update project item field body"
