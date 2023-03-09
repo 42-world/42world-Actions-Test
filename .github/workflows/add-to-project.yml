@@ -26,30 +26,36 @@ jobs:
         run: |
           echo "Finding projectItem id of particular project from issue"
           gh api graphql -f query='
-            query ($Organization: String!, $Repository: String!, $IssueNumber: Int!) {
+            query ($Organization: String!, $Repository: String!, $IssueNumber: Int!, $ProjectField: String!) {
               repository(owner: $Organization, name: $Repository) {
                 issue(number: $IssueNumber) {
                   projectItems(first: 100) {
                     nodes {
                       id
                       project {
+                        id
                         title
+                        field(name: $ProjectField) {
+                          id
+                        }
                       }
                     }
                   }
                 }
               }
             }
-          ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} > projectItem.json
+          ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} -f ProjectField="$PROJECT_FIELD" > projectItem.json
           cat projectItem.json
           PROJECT_ITEM_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .id")
+          PROJECT_FIELD_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .project.field.id")
+          PROJECT_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .project.id")
       - name: Update project item field
         run: |
           echo "Update project item field body"
           gh api graphql -f query='
-            mutation ($ProjectItemId: ID!, $FieldId: ID!, $Body: Date!) {
-              updateProjectV2ItemFieldValue(input: {projectId: $ProjectItemId, fieldId: $FieldId, value: $Body}) {
+            mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: Date!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: $Body}) {
                 clientMutationId
               }
             }
-          ' -f ProjectItemId="$PROJECT_ITEM_ID" -f FieldId="$PROJECT_FIELD" -f Body="$BODY"
+          ' -f ProjectId="$PROJECT_ID" -f ProjectItemId="$PROJECT_ITEM_ID" -f FieldId="$PROJECT_FIELD_ID" -f Body="$BODY"
