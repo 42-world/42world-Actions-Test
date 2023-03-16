@@ -13,20 +13,19 @@ jobs:
     steps:
       - name: Check if comment is a +1
         id: check
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const comment = context.payload.comment;
             return (comment.body.includes('+1') || comment.body.includes(':+1:')) && comment.user.login !== 'github-actions[bot]';
       - name: Add label
         if: steps.check.outputs.result == 'true'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             async function reproducible() {
               const issue = context.issue;
-              const label = 'rep:';
               const labels = context.payload.issue.labels;
               const hasLabel = labels.some(l => l.name.startsWith('rep:'));
               if (!hasLabel) {
@@ -37,7 +36,11 @@ jobs:
                       name: l.name
                     });
                     if (l.name.split(':')[1] <= 3) {
-                      label = l.name.split(':')[0] + ':' + (parseInt(l.name.split(':')[1]) + 1).toString();
+                      const label = l.name.split(':')[0] + ':' + (parseInt(l.name.split(':')[1]) + 1).toString();
+                      await github.issues.addLabels({
+                        ...issue,
+                        labels: [label]
+                      });
                       if (l.name.split(':')[1] == 3) {
                         await github.issues.addLabels({
                           ...issue,
@@ -46,7 +49,7 @@ jobs:
                       }
                     }
                   }
-                });
+                })
               } else {
                 await github.issues.addLabels({
                   ...issue,
@@ -55,4 +58,5 @@ jobs:
               }
             }
             reproducible();
+
 
