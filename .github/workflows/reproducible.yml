@@ -46,10 +46,6 @@ jobs:
                       }
                     }
                   }
-                })
-                await github.issues.addLabels({
-                  ...issue,
-                  labels: [label]
                 });
               } else {
                 await github.issues.addLabels({
