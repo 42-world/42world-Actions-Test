@@ -28,6 +28,7 @@ jobs:
               const issue = context.issue;
               const labels = context.payload.issue.labels;
               const hasLabel = labels.some(l => l.name.startsWith('rep:'));
+              core.info(hasLabel);
               if (!hasLabel) {
                 labels.forEach(async (l) => {
                   if (l.name.startsWith('rep:')) {
