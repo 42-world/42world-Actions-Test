@@ -21,7 +21,7 @@ jobs:
               const issue = context.issue;
               const labels = context.payload.issue.labels;
               core.info(hasLabel);
-              labels.forEach(l => {
+              labels.forEach(async (l) => {
                 if (l.name.startsWith('rep:')) {
                   await github.rest.issues.removeLabel({
                     issue_number: context.issue.number,
