@@ -12,6 +12,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Add label
+        if: steps.check.outputs.result == 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -31,13 +32,16 @@ jobs:
                 });
               }
               let count = 0;
-              context.payload.issue.comments.forEach(async (comment) => {
-                if (comment.user.login !== 'github-actions[bot]') {
-                  if (comment.body.includes('+1') || comment.body.includes(':+1:')) {
-                    count++;
-                  }
-                }
+              const comments = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo
               });
+              for (const comment of comments.data) {
+                if (comment.body.includes('+1')) {
+                  count++;
+                }
+              }
               if (count >= 3) count = 3;
               if (count == 3) {
                 await github.rest.issues.addLabels({
