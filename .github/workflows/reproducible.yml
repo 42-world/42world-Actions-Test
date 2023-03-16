@@ -11,13 +11,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Check if comment is a +1
-        id: check
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const comment = context.payload.comment;
-            return (comment.body.includes('+1') || comment.body.includes(':+1:')) && comment.user.login !== 'github-actions[bot]';
       - name: Add label
         if: steps.check.outputs.result == 'true'
         uses: actions/github-script@v6
@@ -31,41 +24,37 @@ jobs:
               const hasLabel = labels.some(l => l.name.startsWith('rep:'));
               core.info(hasLabel);
               if (hasLabel) {
-                labels.forEach(async (l) => {
-                  if (l.name.startsWith('rep:')) {
-                    await github.rest.issues.removeLabel({
-                      issue_number: context.issue.number,
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      name: [l.name]
-                    });
-                    if (l.name.split(':')[1] <= 3) {
-                      const label = l.name.split(':')[0] + ':' + (parseInt(l.name.split(':')[1]) + 1).toString();
-                      await github.rest.issues.addLabels({
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        labels: [label]
-                      });
-                      if (l.name.split(':')[1] == 3) {
-                        await github.rest.issues.addLabels({
-                          issue_number: context.issue.number,
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          labels: ['reproducible']
-                        });
-                      }
-                    }
-                  }
-                })
-              } else {
-                const res = await github.rest.issues.addLabels({
+                await github.rest.issues.removeLabel({
                   issue_number: context.issue.number,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  labels: ['rep:1']
+                  name: [l.name]
                 });
-                core.info(res);
+              }
+              let count = 0;
+              context.payload.issue.comments.forEach(async (comment) => {
+                if (comment.user.login !== 'github-actions[bot]') {
+                  if (comment.body.includes('+1') || comment.body.includes(':+1:')) {
+                    count++;
+                  }
+                }
+              });
+              if (count >= 3) count = 3;
+              if (count == 3) {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['reproducible']
+                });
+              }
+              if (count > 0) {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['rep:' + count]
+                });
               }
             }
             reproducible();
