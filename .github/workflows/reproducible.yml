@@ -20,16 +20,23 @@ jobs:
             async function reproducible() {
               const issue = context.issue;
               const labels = context.payload.issue.labels;
-              const hasLabel = labels.some(l => l.name.startsWith('rep:'));
               core.info(hasLabel);
-              if (hasLabel) {
-                await github.rest.issues.removeLabel({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: [l.name]
-                });
-              }
+              labels.forEach(l => {
+                if (l.name.startsWith('rep:')) {
+                  await github.rest.issues.removeLabel({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: [l.name]
+                  });
+                }
+              })
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: ['reproducible']
+              });
               let count = 0;
               const comments = await github.rest.issues.listComments({
                 issue_number: context.issue.number,
