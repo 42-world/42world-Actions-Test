@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: Check if comment is a +1
         id: check
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           script: |
             const comment = context.payload.comment;
             return (comment.body.includes('+1') || comment.body.includes(':+1:')) && comment.user.login !== 'github-actions[bot]';
       - name: Add label
         if: steps.check.outputs.result == 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -30,7 +30,7 @@ jobs:
               const labels = context.payload.issue.labels;
               const hasLabel = labels.some(l => l.name.startsWith('rep:'));
               if (!hasLabel) {
-                labels.forEach(l => {
+                labels.forEach(async (l) => {
                   if (l.name.startsWith('rep:')) {
                     await github.issues.removeLabel({
                       ...issue,
@@ -59,3 +59,4 @@ jobs:
               }
             }
             reproducible();
+
