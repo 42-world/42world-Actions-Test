@@ -53,11 +53,11 @@ jobs:
                   }
                 })
               } else {
-                await github.rest.issues.addLabels({
+                const res = await github.rest.issues.addLabels({
                   ...issue,
                   labels: ['rep:1']
                 });
-
+                core.info(res);
               }
             }
             reproducible();
