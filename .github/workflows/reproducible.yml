@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: Check if comment is a +1
         id: check
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const comment = context.payload.comment;
             return (comment.body.includes('+1') || comment.body.includes(':+1:')) && comment.user.login !== 'github-actions[bot]';
       - name: Add label
         if: steps.check.outputs.result == 'true'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
