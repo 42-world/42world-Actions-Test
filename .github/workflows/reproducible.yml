@@ -20,7 +20,6 @@ jobs:
             async function reproducible() {
               const issue = context.issue;
               const labels = context.payload.issue.labels;
-              core.info(hasLabel);
               labels.forEach(async (l) => {
                 if (l.name.startsWith('rep:')) {
                   await github.rest.issues.removeLabel({
