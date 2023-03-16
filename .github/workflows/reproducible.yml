@@ -11,7 +11,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Check if comment is a command
+      - name: Check if comment is a +1
         id: check
         uses: actions/github-script@v3
         with:
@@ -24,35 +24,38 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issue = context.issue;
-            const label = 'rep:';
-            const labels = context.payload.issue.labels;
-            const hasLabel = labels.some(l => l.name.startsWith('rep:'));
-            if (!hasLabel) {
-              labels.forEach(l => {
-                if (l.name.startsWith('rep:')) {
-                  await github.issues.removeLabel({
-                    ...issue,
-                    name: l.name
-                  });
-                  if (l.name.split(':')[1] <= 3) {
-                    label = l.name.split(':')[0] + ':' + (parseInt(l.name.split(':')[1]) + 1).toString();
-                    if (l.name.split(':')[1] == 3) {
-                      await github.issues.addLabels({
-                        ...issue,
-                        labels: ['reproducible']
-                      });
+            async function reproducible() {
+              const issue = context.issue;
+              const label = 'rep:';
+              const labels = context.payload.issue.labels;
+              const hasLabel = labels.some(l => l.name.startsWith('rep:'));
+              if (!hasLabel) {
+                labels.forEach(l => {
+                  if (l.name.startsWith('rep:')) {
+                    await github.issues.removeLabel({
+                      ...issue,
+                      name: l.name
+                    });
+                    if (l.name.split(':')[1] <= 3) {
+                      label = l.name.split(':')[0] + ':' + (parseInt(l.name.split(':')[1]) + 1).toString();
+                      if (l.name.split(':')[1] == 3) {
+                        await github.issues.addLabels({
+                          ...issue,
+                          labels: ['reproducible']
+                        });
+                      }
                     }
                   }
-                }
-              })
-              await github.issues.addLabels({
-                ...issue,
-                labels: [label]
-              });
-            } else {
-              await github.issues.addLabels({
-                ...issue,
-                labels: ['rep:1']
-              });
+                })
+                await github.issues.addLabels({
+                  ...issue,
+                  labels: [label]
+                });
+              } else {
+                await github.issues.addLabels({
+                  ...issue,
+                  labels: ['rep:1']
+                });
+              }
             }
+            reproducible();
