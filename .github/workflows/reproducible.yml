@@ -30,12 +30,6 @@ jobs:
                   });
                 }
               })
-              await github.rest.issues.removeLabel({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: ['reproducible']
-              });
               let count = 0;
               const comments = await github.rest.issues.listComments({
                 issue_number: context.issue.number,
@@ -54,6 +48,14 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   labels: ['reproducible']
+                });
+              }
+              if (count < 3 && labels.some(l => l.name == 'reproducible')) {
+                await github.rest.issues.removeLabel({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: ['reproducible']
                 });
               }
               if (count > 0) {
