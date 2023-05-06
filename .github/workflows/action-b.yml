@@ -10,6 +10,8 @@ on:
 jobs:
   action-a:
     runs-on: ubuntu-latest
+    outputs:
+      alpha_version: ${{ steps.action-a.outputs.alpha_version }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/action-a
