@@ -9,7 +9,7 @@ on:
 
 jobs:
   job-b:
-    needs: action-a.job-a
+    # needs: action-a.job-a
     runs-on: ubuntu-latest
     steps:
       - name: Run my script
