@@ -6,9 +6,9 @@ jobs:
   job-a:
     runs-on: ubuntu-latest
     outputs:
-      output-a: ${{ steps.step1.outputs.alpha_version }}
+      output-a: ${{ steps.test.outputs.alpha_version }}
     steps:
       - name: Run my script
-        id: step1
+        id: test
         run: |
           echo "alpha_version=0.0.1-alpha22" >> $GITHUB_OUTPUT
