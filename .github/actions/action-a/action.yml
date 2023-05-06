@@ -4,9 +4,9 @@ description: "composite run action"
 on: [workflow_call]
 
 runs:
-  using: "composite"
+  # using: "composite"
   steps:
     - name: Run my script
-      id: test
+      shell: bash
       run: |
         echo "alpha_version=0.0.1-alpha22" >> $GITHUB_OUTPUT
