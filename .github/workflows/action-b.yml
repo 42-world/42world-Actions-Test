@@ -22,4 +22,4 @@ jobs:
       - name: Run my script
         id: step1
         run: |
-          echo ${{ needs.action-a.outputs.output-a }}
+          echo ${{ needs.action-a.outputs.alpha_version }}
