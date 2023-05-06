@@ -1,0 +1,20 @@
+name: action-a
+description: "composite run action"
+
+# inputs:
+#   who-to-greet: # id of input
+#     description: "Who to greet"
+#     required: true
+#     default: "World"
+outputs:
+  alpha_version:
+    description: "alpha_version"
+    value: ${{ steps.alpha.outputs.alpha_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: alpha
+      shell: bash
+      run: |
+        echo "alpha_version=0.0.1-alpha22" >> $GITHUB_OUTPUT
