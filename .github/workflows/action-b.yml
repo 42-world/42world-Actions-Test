@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/action-a.yml
+      - uses: ./.github/actions/action-a
         id: action-a
 
   job-c:
