@@ -2,7 +2,7 @@ name: action-b
 
 on:
   workflow_run:
-    workflows: ["action-a"]
+    workflows: [action-a]
     types:
       - completed
 
