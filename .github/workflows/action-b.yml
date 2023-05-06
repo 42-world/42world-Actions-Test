@@ -9,7 +9,9 @@ on:
 
 jobs:
   action-a:
-    uses: ./.github/workflow/action-a.yml
+    - uses: actions/checkout@v3
+    - uses: ./.github/workflow/action-a.yml
+      id: action-a
 
   job-c:
     runs-on: ubuntu-latest
