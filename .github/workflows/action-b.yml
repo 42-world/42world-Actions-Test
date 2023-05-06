@@ -10,8 +10,8 @@ on:
 jobs:
   job-a:
     runs-on: ubuntu-latest
-    # outputs:
-    #   alpha_version: ${{ steps.step-a.outputs.alpha_version }}
+    outputs:
+      alpha_version: ${{ steps.step-a.outputs.alpha_version }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/action-a
@@ -24,4 +24,4 @@ jobs:
       - name: Run my script
         id: step1
         run: |
-          echo ${{ needs.job-a.step-a.outputs.alpha_version }}
+          echo ${{ needs.job-a.outputs.alpha_version }}
