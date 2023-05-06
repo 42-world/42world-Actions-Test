@@ -10,5 +10,5 @@ jobs:
         id: test
         run: |
           echo "alpha_version=0.0.1-alpha22" >> $GITHUB_OUTPUT
-    outputs:
-      output-a: ${{ steps.test.outputs.alpha_version }}
+        outputs:
+          output-a: ${{ steps.test.outputs.alpha_version }}
