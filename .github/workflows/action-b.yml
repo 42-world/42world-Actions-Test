@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "start!"
 
-  job-b:
+  job-c:
     runs-on: ubuntu-latest
     needs: action-a.job-a
     steps:
