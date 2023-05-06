@@ -8,20 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  action-a:
+  job-a:
     runs-on: ubuntu-latest
-    outputs:
-      alpha_version: ${{ steps.action-a.outputs.alpha_version }}
+    # outputs:
+    #   alpha_version: ${{ steps.step-a.outputs.alpha_version }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/action-a
-        id: action-a
+        id: step-a
 
   job-c:
     runs-on: ubuntu-latest
-    needs: [action-a]
+    needs: [job-a]
     steps:
       - name: Run my script
         id: step1
         run: |
-          echo ${{ needs.action-a.outputs.alpha_version }}
+          echo ${{ needs.job-a.step-a.outputs.alpha_version }}
