@@ -8,16 +8,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  job-b:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run my script
-        run: |
-          echo "start!"
+  action-a:
+    uses: ./.github/workflow/action-a.yml
 
   job-c:
     runs-on: ubuntu-latest
-    needs: action-a
+    needs: [action-a]
     steps:
       - name: Run my script
         id: step1
