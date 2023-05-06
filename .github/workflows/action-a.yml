@@ -1,11 +1,6 @@
 name: action-a
 
-on:
-  pull_request:
-    branches: ["develop"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: [workflow_call]
 
 jobs:
   job-a:
