@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ADD_TO_PROJECT_PAT }}
       - name: Build
         run: echo ${{ github.sha }} > Release.txt
       - run: echo ${{ secrets.test_secret }}
