@@ -1,0 +1,72 @@
+name: Reproducible
+
+on:
+  issue_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  reproducible:
+    name: Reproducible
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Add label
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          debug: true
+          script: |
+            async function reproducible() {
+              const issue = context.issue;
+              const labels = context.payload.issue.labels;
+              labels.forEach(async (l) => {
+                if (l.name.startsWith('rep:')) {
+                  await github.rest.issues.removeLabel({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: [l.name]
+                  });
+                }
+              })
+              let count = 0;
+              const comments = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              for (const comment of comments.data) {
+                if (comment.body.includes('+1')) {
+                  count++;
+                }
+              }
+              if (count >= 3) count = 3;
+              if (count == 3) {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['reproducible']
+                });
+              }
+              if (count < 3 && labels.some(l => l.name == 'reproducible')) {
+                await github.rest.issues.removeLabel({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: ['reproducible']
+                });
+              }
+              if (count > 0) {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['rep:' + count]
+                });
+              }
+            }
+            reproducible();
+
+

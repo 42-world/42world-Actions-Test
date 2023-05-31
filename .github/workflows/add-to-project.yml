@@ -1,0 +1,90 @@
+name: Add bugs to bugs project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      # This is the env for step 2
+      PROJECT_NAME: "@Yaminyam's untitled project"
+      PROJECT_FIELD: Start Date
+      BODY: ${{ github.event.issue.created_at | date('Asia/Seoul', 'YYYY-MM-DD') }}
+      #using date or text or number
+      BODY_TYPE: date
+    steps:
+      - uses: actions/add-to-project@v0.4.0
+        with:
+          # You can target a repository in a different organization
+          # to the issue
+          project-url: https://github.com/orgs/42-world/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - name: Finding projectItem id of particular project from issue
+        run: |
+          echo "Finding projectItem id of particular project from issue"
+          gh api graphql -f query='
+            query ($Organization: String!, $Repository: String!, $IssueNumber: Int!) {
+              repository(owner: $Organization, name: $Repository) {
+                issue(number: $IssueNumber) {
+                  projectItems(first: 100) {
+                    nodes {
+                      id
+                      project {
+                        id
+                        title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f Organization="${{ github.event.repository.owner.login }}" -f Repository="${{ github.event.repository.name }}" -F IssueNumber=${{ github.event.issue.number }} > projectItem.json
+          cat projectItem.json
+          PROJECT_ITEM_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .id")
+          PROJECT_ID=$(cat projectItem.json | jq -r ".data.repository.issue.projectItems.nodes | .[] | select(.project.title == \"$PROJECT_NAME\") | .project.id")
+          echo "PROJECT_ITEM_ID=$PROJECT_ITEM_ID" >> $GITHUB_ENV
+          echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+      - name: Finding project field id
+        run: |
+          echo "Finding project field id"
+          gh api graphql -f query='
+            query ($ProjectId: ID!) {
+              node(id: $ProjectId) {
+                ... on ProjectV2 {
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2Field {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f ProjectId="${{ env.PROJECT_ID }}" > projectField.json
+          cat projectField.json
+          PROJECT_FIELD_ID=$(cat projectField.json | jq -r ".data.node.fields.nodes | .[] | select(.name == \"$PROJECT_FIELD\") | .id")
+          echo "PROJECT_FIELD_ID=$PROJECT_FIELD_ID" >> $GITHUB_ENV
+      - name: Update project item field
+        run: |
+          echo "Update project item field body"
+          if [ "$BODY_TYPE" = "number" ]; then
+            BODY_GH_TYPE="Int"
+          elif [ "$BODY_TYPE" = "date" ]; then
+            BODY_GH_TYPE="Date"
+          else
+            BODY_GH_TYPE="String"
+          fi
+          gh api graphql -f query='
+            mutation ($ProjectId: ID!, $ProjectItemId: ID!, $FieldId: ID!, $Body: '"${BODY_GH_TYPE}"') {
+              updateProjectV2ItemFieldValue(input: {projectId: $ProjectId, fieldId: $FieldId, itemId: $ProjectItemId, value: {'"${BODY_TYPE}"': $Body}}) {
+                clientMutationId
+              }
+            }
+          ' -f ProjectId="${{ env.PROJECT_ID }}" -f ProjectItemId="${{ env.PROJECT_ITEM_ID }}" -f FieldId="${{ env.PROJECT_FIELD_ID }}" -f Body="$BODY"

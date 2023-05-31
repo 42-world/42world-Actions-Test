@@ -6,7 +6,10 @@
 # https://github.com/actions/labeler
 
 name: Labeler
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   label:
@@ -17,6 +20,6 @@ jobs:
       pull-requests: write
 
     steps:
-    - uses: actions/labeler@v4
+    - uses: jsoref/labeler@fix-labeler
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
