@@ -1,14 +1,15 @@
 name: 'Auto Label'
 
 on:
-  pull_request:
+  pull_request_target:
     types: [labeled, unlabeled, opened, synchronize, reopened]
 
 permissions:
+  issues: write
   pull-requests: write
 
 jobs:
   auto-label:
     runs-on: ubuntu-latest
     steps:
-      - uses: Yaminyam/auto-label-in-issue@master
+      - uses: Yaminyam/auto-label-in-issue@1.6.0
